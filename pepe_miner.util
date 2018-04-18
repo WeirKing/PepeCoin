@@ -1,0 +1,76 @@
+/**
+ * Title: pepe_miner.util
+ * Author: Kixo
+ * Purpose: utility functions for the pepe miner
+ * Date: 4/1/2018
+ */
+
+#include "pepe_miner.h"               /* Header information for pepe_miner */
+
+/*
+ * Sends a message to the specified connected client known as a buddy, defined by the supplied socket connector
+ * TODO: Everything
+ */
+int send_message(MESSAGE *message, int sockfd){
+    send(sockfd, message, MESSAGE_LENGTH, 0);
+}
+
+/*
+ * Broadcasts a message to all actively connected clients, known as buddies.
+ * 
+ * TODO: implement using send_message.
+ */
+int broadcast_message(MESSAGE *message){
+    
+}
+
+/*
+ * Initializes listening connection so other buddies may connect
+ * Also attempts to create a connection with the currently known active buddies.
+ * 
+   RETURN: integer identifier reporting success
+ * TODO: create connection with currently known buddies
+ */
+int initialize_connection(){
+    if ((welcome_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+        quit_error("There was a problem initializing the welcome socket\n");
+    }
+
+    struct sockaddr_in server_address;
+    server_address.sin_family       = AF_INET;
+    server_address.sin_addr.s_addr  = htonl(INADDR_ANY);            //Any incoming interface
+    server_address.sin_port         = htons(WELCOME_PORT);
+
+    if (bind(welcome_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0){
+        quit_error("There was a problem binding the welcome socket\n");
+    }
+    if (listen(welcome_socket, 128) < 0){
+        quit_error("The welcome socket is unable to listen\n");
+    }
+    //The welcome_socket is now fully functional and able to accept incoming requests to the local ip address and welcome port
+    return 0;
+}
+
+/*
+ * Connect to the buddy designated by the particular ip address and port
+
+ * RETURN: the integer of the socket
+ * TODO: None
+ */
+int connect_to_client(char *ip, int port){
+    int client_socket;
+    struct sockaddr_in new_client_address;
+
+    if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+        quit_error("There was a problem initializing the new client socket\n");
+    }
+
+    new_client_address.sin_family   = AF_INET;
+    new_client_address.sin_port     = htons(port);
+    inet_pton(AF_INET, ip, &new_client_address.sin_addr);
+
+    cout << connect(client_socket, (struct sockaddr *) &new_client_address, sizeof(new_client_address)) << endl;
+    //client_socket is now an active socket with the specified client
+
+    return client_socket;
+}
