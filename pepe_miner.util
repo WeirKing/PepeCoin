@@ -9,19 +9,25 @@
 
 /*
  * Sends a message to the specified connected client known as a buddy, defined by the supplied socket connector
- * TODO: Everything
+ * TODO: NONE
  */
 int send_message(MESSAGE *message, int sockfd){
     send(sockfd, message, MESSAGE_LENGTH, 0);
+    return 0;
 }
 
 /*
  * Broadcasts a message to all actively connected clients, known as buddies.
  * 
- * TODO: implement using send_message.
+ * TODO: NONE
  */
 int broadcast_message(MESSAGE *message){
-    
+    int i, sockfd;
+    for (i = 0; i < connected_clients.size(); i++){
+        sockfd = connected_clients[i];
+        send_message(message, sockfd);
+    }
+    return 0;
 }
 
 /*

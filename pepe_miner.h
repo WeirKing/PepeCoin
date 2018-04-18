@@ -11,6 +11,7 @@
 #include        <arpa/inet.h>           /* for sockaddr_in and inet_ntoa() */
 #include        <sys/types.h>
 #include        <iostream>
+#include        <vector>
 
 using namespace std;
 
@@ -42,6 +43,7 @@ int initialize_connection();
 void quit_error(string error_message);
 int connect_to_client(char *ip, int port);
 
+vector<int> connected_clients = vector<int>();
 
 /*
  * Quit the program with the given error message

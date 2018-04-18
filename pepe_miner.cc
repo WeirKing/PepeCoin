@@ -29,6 +29,6 @@ int main_operation_loop(){
 int main() {
     //initialize_connection();
     int new_client_socket;
-    new_client_socket = connect_to_client("127.0.0.1", 60000);
+    new_client_socket = connect_to_client((char *)"127.0.0.1", 60000);
     close(new_client_socket);
 }
