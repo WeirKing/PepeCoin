@@ -20,8 +20,26 @@
  * TODO: Everything
  */
 int main_operation_loop(){
+    int max_fd = 0, i, fd_result;
+    fd_set fds;
+    for (i = 0; i < connected_clients.size(); i++){
+        FD_SET(connected_clients[i], &fds);                          //Set the specified client file descriptor to be waited on
+        if (connected_clients[i] > max_fd){
+            max_fd = connected_clients[i] + 1;                         //The max file descriptor must be one greated than the largest file descriptor
+        }
+    }
+    fd_result = select(max_fd, &fds, NULL, NULL, NULL);             //Wait indefinitely for a return on one of the clients.
+    if (fd_result == -1){
+        printf("Error on selecting a client file descriptor\n");
+        exit(1);
+    }
 
-}
+    for (i = 0; i < connected_clients.size(); i++){                 //Check each individual client to see which has an awaiting message (can have multiple messages per select).
+        if (FD_ISSET(connected_clients[i], &fds)){
+            handle_incoming_message(connected_clients[i]);          //Handle incoming message based on client socket fd.
+        }
+    }
+}  
 
 /*
  * First thing run when starting the function. Should implement the main_operation_loop to perform its stuff.
@@ -30,5 +48,11 @@ int main() {
     //initialize_connection();
     int new_client_socket;
     new_client_socket = connect_to_client((char *)"127.0.0.1", 60000);
+    MESSAGE *message = new MESSAGE;
+    message->header = 'M';
+    strcpy(message->info, (char *)"This is a message to the server\n\0");
+
+    send_message(message, new_client_socket);
+    cout << "Message successfully sent to server\n";
     close(new_client_socket);
 }

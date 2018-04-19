@@ -12,6 +12,7 @@
 #include        <sys/types.h>
 #include        <iostream>
 #include        <vector>
+#include        "unistd.h"              /* for read(fd, buffer, size) */
 
 using namespace std;
 

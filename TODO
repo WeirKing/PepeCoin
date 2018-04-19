@@ -1,0 +1,5 @@
+
+
+Mining should be implemented parallel to handling client/miner communications
+Create a framework for the transactions
+Create a framework for mining a new pepecoin
