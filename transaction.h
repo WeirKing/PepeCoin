@@ -48,7 +48,7 @@ public:
         is >> s.signed_hash;
         is >> s.public_key;
         is.get();
-        if (is.get() == 'C'){
+        if (is.get() == 'Z'){
             s.previous_transaction = NULL;
             int a;
             is >> a;
