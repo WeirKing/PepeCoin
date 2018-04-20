@@ -3,3 +3,8 @@
 Mining should be implemented parallel to handling client/miner communications
 Create a framework for the transactions
 Create a framework for mining a new pepecoin
+
+
+Separate the console interface and the backend network handling into separate threads.
+
+Learn how to implement RSA and sha using cryptopp. if that's not a good option (even though it should be) find another option.

@@ -23,9 +23,9 @@ int main_operation_loop(){
     int max_fd = 0, i, fd_result;
     fd_set fds;
     for (i = 0; i < connected_clients.size(); i++){
-        FD_SET(connected_clients[i], &fds);                          //Set the specified client file descriptor to be waited on
+        FD_SET(connected_clients[i], &fds);                         //Set the specified client file descriptor to be waited on
         if (connected_clients[i] > max_fd){
-            max_fd = connected_clients[i] + 1;                         //The max file descriptor must be one greated than the largest file descriptor
+            max_fd = connected_clients[i] + 1;                      //The max file descriptor must be one greated than the largest file descriptor
         }
     }
     fd_result = select(max_fd, &fds, NULL, NULL, NULL);             //Wait indefinitely for a return on one of the clients.
@@ -39,6 +39,7 @@ int main_operation_loop(){
             handle_incoming_message(connected_clients[i]);          //Handle incoming message based on client socket fd.
         }
     }
+    return 0;
 }  
 
 /*

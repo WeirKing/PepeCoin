@@ -52,7 +52,6 @@ int main_communication_loop(){
         int new_client_socket;
         new_client_socket = accept(welcome_socket, (struct sockaddr *) &new_client_address, &client_address_length);
         connected_clients.push_back(new_client_socket);
-        cout << "Accepted new client\n";
     }
 
     if (FD_ISSET(0, &fds)){                                         //Check if there is standard input.
@@ -62,14 +61,7 @@ int main_communication_loop(){
             end_program = true;
         }
     }
-
-/*      //Test code to see which file descriptor is set
-    for (i = 0; i < max_fd; i++){
-        if (FD_ISSET(i, &fds)){
-            cout << "fd set: " << i << endl;
-        }
-    }
-*/
+    return 0;
 }  
 
 /*
