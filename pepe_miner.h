@@ -43,6 +43,9 @@ int broadcast_message(MESSAGE *message);
 int initialize_connection();
 void quit_error(string error_message);
 int connect_to_client(char *ip, int port);
+void handle_transaction_message(MESSAGE *m);
+//Queue a message to be sent to the console. Used for errors or new information stuff
+void console_message(string message);
 
 vector<int> connected_clients = vector<int>();
 

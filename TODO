@@ -1,10 +1,15 @@
 
 
 Mining should be implemented parallel to handling client/miner communications
-Create a framework for the transactions
+
+Change the transaction framework to be entirely based on a hash table rather than a linked list. 
 Create a framework for mining a new pepecoin
 
 
 Separate the console interface and the backend network handling into separate threads.
 
 Learn how to implement RSA and sha using cryptopp. if that's not a good option (even though it should be) find another option.
+
+
+TODO Decide whether transactions should have a linked list or not. I really don't know if transactions should have a reference to their previous transaction or not. Definitely not next transaction but maybe previous transaction ://///
+

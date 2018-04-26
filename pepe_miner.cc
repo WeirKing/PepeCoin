@@ -13,6 +13,11 @@
 #include        <sys/types.h>
 #include        "pepe_miner.util"       /* utility funcions for pepe miner */
 #include        <unistd.h>
+#include        <assert.h>
+#include        "transaction.h"
+#include        "transaction_database.h"
+
+TransactionDB transaction_db;
 
 /*
  * Performs all the functions of the pepe coin including the console interface. Run in a continual loop
@@ -40,7 +45,33 @@ int main_operation_loop(){
         }
     }
     return 0;
-}  
+}
+
+
+/*
+ * Handles a new transaction received from the network
+ * It should either add the transaction to the currently mined block or add it to the queue of transactions to be added to new block.
+ * Should only handle valid transactions, if the transaction is invalid just do nothing
+ *
+ * TODO most everything
+ */
+void handle_transaction_message(MESSAGE *m){
+    assert(m->header == 'T');
+    Transaction t;              //the received transaction 
+                                //TODO make this actually receive the transaction lmao
+
+    string prev_hash = t.prev_hash;
+    Transaction *prev_t = transaction_db.get(prev_hash);
+    if (prev_t == NULL){
+        console_message("Received invalid transaction");
+    }
+    bool valid = t.verify_transaction(prev_t);
+    if (!valid){
+        console_message("Received invalid transaction");
+    }
+
+    //TODO add the new transaction to the queue of new transactions
+}
 
 /*
  * First thing run when starting the function. Should implement the main_operation_loop to perform its stuff.

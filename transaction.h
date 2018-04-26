@@ -4,11 +4,12 @@
 #include        <sys/types.h>
 #include        "pepe_miner.util"       /* utility funcions for pepe miner */
 #include        <unistd.h>
+#include        "crypto_util.cpp"
 
 /*
  * A transaction in theory is the public key of the current owner, a hash of the pub key of current owner 
         and the previous transaction data signed with the private key of the past owner
- * There's two data fields in actuality, the signed hash, and the pub key of current owner. 
+ * There's three data fields in actuality, hash of the previous transaction, the public key of the owner, and the signature of both. 
  * We will also track the previous transaction and the next transaction in a doubly linked list format. 
  * If we ever need want to prune previous transactions we need just traverse the list back in time 
         and clear out previous transactions.
@@ -19,24 +20,28 @@
 
 class Transaction{
 public:
-    uint64_t signed_hash;
-    uint64_t public_key;
-    Transaction *previous_transaction;
-    Transaction *next_transaction;
+    string signed_hash;
+    string public_key;
+    string prev_hash;
 
+    Transaction(string new_owner, Transaction *prev_t, string private_key);//Creates a new transaction in full
+    Transaction();
+    bool verify_transaction(Transaction *prev);
+    friend std::ostream& operator<<(std::ostream& os, const Transaction& s);
+    friend std::istream& operator>>(std::istream& is, Transaction& s);
+    
+private:
+    void set_hash(Transaction *prev);
+    void sign_hash(string private_key);
 
 /*
  * Output this transaction and all previous transactions to a file
  */
     friend std::ostream& operator<<(std::ostream& os, const Transaction& s)
     {
+        os << s.prev_hash << endl;
         os << s.signed_hash << endl;
         os << s.public_key << endl;
-        if (s.previous_transaction == NULL){
-            os << 'Z' << endl;
-        } else {
-            os << *(s.previous_transaction);
-        }
         return os;
     }
 
@@ -45,26 +50,49 @@ public:
  */
     friend std::istream& operator>>(std::istream& is, Transaction& s)
     {
+        is >> s.prev_hash;
         is >> s.signed_hash;
         is >> s.public_key;
-        is.get();
-        if (is.get() == 'Z'){
-            s.previous_transaction = NULL;
-            int a;
-            is >> a;
-        } else {
-            is.unget();
-            Transaction *new_transaction = new Transaction;
-            s.previous_transaction = new_transaction;
-            new_transaction->next_transaction = &s;
-            is >> *new_transaction;
-        }
         return is;
 
     }
-
-    void set_hash(uint64_t new_owner, uint64_t owner_private_key){
-        
-    }
 };
+
+/*
+ * Sets the hash for this transaction based on the previous 
+ */
+void Transaction::set_hash(Transaction *prev)
+{
+    crypto::hash_transaction(prev->public_key, prev->prev_hash, prev->signed_hash, &prev_hash);
+}
+
+/*
+ * Signs the hash with the supplied private key
+ */
+void Transaction::sign_hash(string private_key)
+{
+    crypto::sign_hash(prev_hash, private_key, &signed_hash);
+}
+
+/*
+ * Verifies that the transaction is valid based on the set previous transaction. Previous transaction is 100% trusted.
+ * Previous transaction must be set first before calling this function
+ */
+bool Transaction::verify_transaction(Transaction *prev){
+    string prev_pub_key = prev->public_key;
+    string real_prev_hash;
+    crypto::hash_transaction(previous_transaction, real_prev_hash);
+    if (real_prev_hash != prev_hash){
+        return false;
+    }
+    
+    crypto::verify_signature(signed_hash, hash, public_key)
+    return true;
+}
+
+Transaction::Transaction(string new_owner, Transaction *prev_t){
+    previous_transaction = prev_t;
+    public_key = new_owner;
+    set_hash();
+}
 
