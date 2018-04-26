@@ -59,7 +59,7 @@ void handle_transaction_message(MESSAGE *m){
     string prev_hash;
     Transaction *t_p, t, *prev_t;
 	assert(m->header == 'T');
-	t_p = (Transaction *)m;		//TODO make sure this nonsense actually works lmao
+	t_p = (Transaction *)m->info;		//TODO make sure this nonsense actually works lmao
     t = *t_p;
 
 	prev_t = transaction_db.get(prev_hash);
