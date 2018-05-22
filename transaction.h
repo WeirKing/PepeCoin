@@ -1,8 +1,11 @@
+
+#ifndef __transaction__
+#define __transaction__
+
 #include        <stdio.h>               /* printf() and fprintf() */
 #include        <stdlib.h>              /* for atoi() and exit() */
 #include        <arpa/inet.h>           /* for sockaddr_in and inet_ntoa() */
 #include        <sys/types.h>
-#include        "pepe_miner.util"       /* utility funcions for pepe miner */
 #include        <unistd.h>
 #include        "crypto_util.cpp"
 
@@ -23,6 +26,7 @@ public:
     string signed_hash;
     string public_key;
     string prev_hash;
+    Transaction *previous_transaction;
 
     Transaction(string new_owner, Transaction *prev_t, string private_key);//Creates a new transaction in full
     Transaction();
@@ -86,7 +90,7 @@ bool Transaction::verify_transaction(Transaction *prev){
         return false;
     }
     
-    crypto::verify_signature(signed_hash, hash, public_key)
+    crypto::verify_signature(signed_hash, real_prev_hash, public_key);
     return true;
 }
 
@@ -96,3 +100,4 @@ Transaction::Transaction(string new_owner, Transaction *prev_t){
     set_hash();
 }
 
+#endif

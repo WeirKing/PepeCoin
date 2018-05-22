@@ -5,15 +5,15 @@
 #include		"cryptopp700/hex.h"
 #include		<string>
 #include		<iostream>
-#include		"transaction.h"
 
 using namespace std;
 namespace crypto{
 
-void write_key_to_string(CryptoPP::InvertibleRSAFunction privKey, string file);
-void write_key_to_string(CryptoPP::RSAFunction pubKey, string file);
-void read_key_from_string(CryptoPP::InvertibleRSAFunction &privKey, string file);
-void read_key_from_string(CryptoPP::RSAFunction &pubKey, string file);
+void write_key_to_string(CryptoPP::InvertibleRSAFunction privKey, string &file);
+void write_key_to_string(CryptoPP::RSAFunction pubKey, string &file);
+void read_key_from_string(CryptoPP::InvertibleRSAFunction &privKey, string &file);
+void read_key_from_string(CryptoPP::RSAFunction &pubKey, string &file);
+void create_key_pair(string &pubKeyBuffer, string &privKeyBuffer);
 void hash_transaction(string public_key, string prev_hash, string signed_hash, string &digest);
 void sign_hash(string hash, string priv_key, string &buffer);
 bool verify_signature(string signed_hash, string hash, string public_key);
@@ -21,7 +21,7 @@ bool verify_signature(string signed_hash, string hash, string public_key);
 
 
 /*
- * Writes a private key to a file. Overloaded for writing public keys
+ * Writes a private key to a string. Overloaded for writing public keys
  */
 void write_key_to_string(CryptoPP::InvertibleRSAFunction privKey, string &file){
 	CryptoPP::AutoSeededRandomPool rng;
@@ -30,7 +30,7 @@ void write_key_to_string(CryptoPP::InvertibleRSAFunction privKey, string &file){
 	privKeySink.MessageEnd();
 }
 /*
- * Writes a public key to a file. 
+ * Writes a public key to a string. 
  */
 void write_key_to_string(CryptoPP::RSAFunction pubKey, string &file)
 {
@@ -41,9 +41,9 @@ void write_key_to_string(CryptoPP::RSAFunction pubKey, string &file)
 }
 
 /*
- * Reads a private key from file. Overloaded for reading public keys
+ * Reads a private key from string. Overloaded for reading public keys
  */
-void read_key_from_file(CryptoPP::InvertibleRSAFunction &privKey, string &file)
+void read_key_from_string(CryptoPP::InvertibleRSAFunction &privKey, string &file)
 {
 	CryptoPP::ByteQueue bytes;
 	CryptoPP::StringSource fyle(file, true, new CryptoPP::Base64Decoder);
@@ -52,9 +52,9 @@ void read_key_from_file(CryptoPP::InvertibleRSAFunction &privKey, string &file)
 	privKey.Load(bytes);
 }
 /*
- * Reads a public key from file.
+ * Reads a public key from string.
  */
-void read_key_from_file(CryptoPP::RSAFunction &pubKey, string &file)
+void read_key_from_string(CryptoPP::RSAFunction &pubKey, string &file)
 {
 	CryptoPP::ByteQueue bytes;
 	CryptoPP::StringSource fyle(file, true, new CryptoPP::Base64Decoder);
@@ -65,18 +65,22 @@ void read_key_from_file(CryptoPP::RSAFunction &pubKey, string &file)
 /*
  * Signs the supplied hash with the supplied private key
  * Returns the hash in buffer
+ * TODO unknown, but problems persist.
  */
 void sign_hash(string hash, string priv_key, string &buffer)
 {
-	CryptoPP::InvertibleRSAFunction privKey;
-	read_key_from_string(privKey, priv_key);
+	CryptoPP::InvertibleRSAFunction priv_key_function;
+	read_key_from_string(priv_key_function, priv_key);
 	CryptoPP::AutoSeededRandomPool rng;
-	CryptoPP::RSASSA_PKCS1v15_SHA_Signer privSign(privKey);
+	CryptoPP::RSASSA_PKCS1v15_SHA_Signer privSign(priv_key_function);
 	string lmao;
 
 	CryptoPP::byte *signature;
-	privSign.SignMessage(rng, (const CryptoPP::byte *)hash.data(), sizeof hash, &signature);
+	privSign.SignMessage(rng, (CryptoPP::byte *)hash.data(), sizeof hash, signature);
+	CryptoPP::Base64Encoder privKeySink(new CryptoPP::StringSink(buffer));
 
+	//signature.DEREncode(privKeySink);
+	privKeySink.MessageEnd();
 }
 
 /*

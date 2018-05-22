@@ -16,6 +16,7 @@
 #include		<assert.h>
 #include		"transaction.h"
 #include		"transaction_database.h"
+#include		"pepe_client.cc"
 
 TransactionDB transaction_db;
 
@@ -88,4 +89,6 @@ int main() {
 	send_message(message, new_client_socket);
 	cout << "Message successfully sent to server\n";
 	close(new_client_socket);
+
+	console();
 }

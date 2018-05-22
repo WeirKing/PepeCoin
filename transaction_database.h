@@ -1,16 +1,19 @@
 /**
  * A List of all the unspent transactions.
  */
-
+#ifndef __transaction_db__
+#define __transaction_db__
 
 #include 		<map>
 #include		<string>
 #include 		"transaction.h"
 
+
+
 class TransactionDB{
 public:
 
-std::map<CryptoPP::Integer, Transaction> map;
+std::map<string, Transaction> map;
 
 /*
  * Adds the transaction to the database. Assumes the hash is valid already. 
@@ -25,3 +28,5 @@ void remove(string hash);
  */
 Transaction* get(string hash);
 };
+
+#endif

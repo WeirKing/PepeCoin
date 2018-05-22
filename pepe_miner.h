@@ -14,6 +14,8 @@
 #include        <vector>
 #include        "unistd.h"              /* for read(fd, buffer, size) */
 
+#ifndef __pepe_miner__
+#define __pepe_miner__
 using namespace std;
 
 #define MESSAGE_LENGTH 1024
@@ -56,3 +58,6 @@ void quit_error(string error_message){
     cout << error_message << endl;
     exit(1);
 }
+
+
+#endif
