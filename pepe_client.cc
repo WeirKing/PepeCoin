@@ -1,5 +1,5 @@
 #include		"pepe_miner.h"
-
+#include		"crypto_util.cpp"
 using namespace std;
 
 void console(){
@@ -11,3 +11,5 @@ void console(){
 		cin >> input;
 	}
 }
+
+

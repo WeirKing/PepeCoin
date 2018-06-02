@@ -27,9 +27,9 @@ public:
     string public_key;
     string prev_hash;
     Transaction *previous_transaction;
-
-    Transaction(string new_owner, Transaction *prev_t, string private_key);//Creates a new transaction in full
     Transaction();
+    Transaction(string new_owner, Transaction *prev_t, string private_key);//Creates a new transaction in full
+    Transaction(string new_owner, Transaction *prev_t);
     bool verify_transaction(Transaction *prev);
     friend std::ostream& operator<<(std::ostream& os, const Transaction& s);
     friend std::istream& operator>>(std::istream& is, Transaction& s);
@@ -67,7 +67,7 @@ private:
  */
 void Transaction::set_hash(Transaction *prev)
 {
-    crypto::hash_transaction(prev->public_key, prev->prev_hash, prev->signed_hash, &prev_hash);
+    crypto::hash_transaction(prev->public_key + prev->prev_hash + prev->signed_hash, prev_hash);
 }
 
 /*
@@ -75,7 +75,7 @@ void Transaction::set_hash(Transaction *prev)
  */
 void Transaction::sign_hash(string private_key)
 {
-    crypto::sign_hash(prev_hash, private_key, &signed_hash);
+    crypto::sign_hash(prev_hash, private_key, signed_hash);
 }
 
 /*
@@ -85,7 +85,8 @@ void Transaction::sign_hash(string private_key)
 bool Transaction::verify_transaction(Transaction *prev){
     string prev_pub_key = prev->public_key;
     string real_prev_hash;
-    crypto::hash_transaction(previous_transaction, real_prev_hash);
+    string info = prev->signed_hash + public_key + prev_hash;
+    crypto::hash_transaction(info, real_prev_hash);
     if (real_prev_hash != prev_hash){
         return false;
     }
@@ -97,7 +98,7 @@ bool Transaction::verify_transaction(Transaction *prev){
 Transaction::Transaction(string new_owner, Transaction *prev_t){
     previous_transaction = prev_t;
     public_key = new_owner;
-    set_hash();
+    set_hash(prev_t);
 }
 
 #endif
