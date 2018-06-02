@@ -10,3 +10,9 @@ Separate the console interface and the backend network handling into separate th
 
 TODO Decide whether transactions should have a linked list or not. I really don't know if transactions should have a reference to their previous transaction or not. Definitely not next transaction but maybe previous transaction ://///
 
+
+
+Get the basic console working
+	load a key from supplied file (also load default key from file on startup)
+	Store and load the available transactions to a private key.
+	Generate a transaction.
