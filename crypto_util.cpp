@@ -22,10 +22,10 @@ namespace crypto{
 using Signer 	= CryptoPP::RSASS<CryptoPP::PSSR, CryptoPP::Whirlpool>::Signer;
 using Verifier 	= CryptoPP::RSASS<CryptoPP::PSSR, CryptoPP::Whirlpool>::Verifier;
 
-void write_key_to_string(const CryptoPP::RSA::PrivateKey pv_key, string &pv_key_string);
-void write_key_to_string(const CryptoPP::RSA::PublicKey pubKey, string &pb_key_string);
-void read_key_from_string(CryptoPP::RSA::PrivateKey &privKey, const string file);
-void read_key_from_string(CryptoPP::RSA::PublicKey &pubKey, const string file);
+void write_key_to_string(const CryptoPP::RSA::PrivateKey pv_key, string &pv_key_str);
+void write_key_to_string(const CryptoPP::RSA::PublicKey pb_Key, string &pb_key_str);
+void read_key_from_string(CryptoPP::RSA::PrivateKey &pv_key, const string pv_key_str);
+void read_key_from_string(CryptoPP::RSA::PublicKey &pb_key, const string pb_key_str);
 void create_key_pair(string &pubKeyBuffer, string &privKeyBuffer);
 void hash_transaction(string data, string &digest);
 string sign_hash(string hash, string priv_key);
@@ -36,10 +36,9 @@ bool verify_signature(string signed_hash, string hash, string public_key);
 /*
  * Writes a private key to a string. Overloaded for writing public keys
  */
-void write_key_to_string(const CryptoPP::RSA::PrivateKey pv_key, string &pv_key_string){
-	pv_key_string = "";
-	CryptoPP::Base32Encoder ss(
-		new CryptoPP::StringSink(pv_key_string));
+void write_key_to_string(const CryptoPP::RSA::PrivateKey pv_key, string &pv_key_str){
+	pv_key_str = "";
+	CryptoPP::StringSink ss(pv_key_str);
 	pv_key.DEREncode(ss);
 	ss.MessageEnd();
 }
@@ -49,11 +48,7 @@ void write_key_to_string(const CryptoPP::RSA::PrivateKey pv_key, string &pv_key_
 void write_key_to_string(const CryptoPP::RSA::PublicKey pb_key, string &pb_key_string)
 {
 	pb_key_string = "";
-	/*
 	CryptoPP::StringSink ss(pb_key_string);
-	*/
-	CryptoPP::Base32Encoder ss(
-		new CryptoPP::StringSink(pb_key_string));
 	pb_key.DEREncode(ss);
 	ss.MessageEnd();
 }
@@ -61,25 +56,11 @@ void write_key_to_string(const CryptoPP::RSA::PublicKey pb_key, string &pb_key_s
 /*
  * Reads a private key from string. Overloaded for reading public keys
  */
-void read_key_from_string(CryptoPP::RSA::PrivateKey &pv_key, const string pv_key_string)
+void read_key_from_string(CryptoPP::RSA::PrivateKey &pv_key, const string pv_key_str)
 {
 
-	CryptoPP::ByteQueue bytes;
-	CryptoPP::StringSource ss(pv_key_string, true, new CryptoPP::Base32Decoder);
-	ss.TransferTo(bytes);
-	bytes.MessageEnd();
-	pv_key.Load(bytes);
-	//CryptoPP::StringSource ss(pv_key_string, true);
-	/*
-	cout << "asdfasdf\n";
-
-	CryptoPP::StringSource ss(pv_key_string, true, 
-		new CryptoPP::Base64Decoder());
-	CryptoPP::RSASS<CryptoPP::PSSR, CryptoPP::SHA1>::Verifier pub;
-	cout << "does this part of key\n";
-
+	CryptoPP::StringSource ss(pv_key_str, true);
 	pv_key.BERDecode(ss);
-	*/
 }
 /*
  * Reads a public key from string.
@@ -87,8 +68,7 @@ void read_key_from_string(CryptoPP::RSA::PrivateKey &pv_key, const string pv_key
 void read_key_from_string(CryptoPP::RSA::PublicKey &pb_key, const string pb_key_string)
 {
 	//CryptoPP::StringSource ss(pb_key_string, true);
-	CryptoPP::StringSource ss(pb_key_string, true, 
-		new CryptoPP::Base32Decoder());
+	CryptoPP::StringSource ss(pb_key_string, true);
 	pb_key.BERDecode(ss);
 }
 
@@ -117,14 +97,14 @@ string sign_hash(string hash, string priv_key){
  * Returns true if the supplied signed hash is the signed version of the supplied hash given the supplied public key
  * Treats all hashes as unencoded text
  */
-bool verify_signature(string signed_hash, string hash, string public_key_string){
+bool verify_signature(string signature, string hash, string public_key_string){
 	CryptoPP::RSA::PublicKey public_key;
 	read_key_from_string(public_key, public_key_string);
 
 /*
-	string decoded_signature, decoded_hash;
+	string decoded_signature;
 	CryptoPP::StringSource ss(signed_hash, true,
-		new CryptoPP::HexDecoder(
+		new CryptoPP::Base32Decoder(
 			new CryptoPP::StringSink(decoded_signature)));
 
 //Code to unencode the supplied hash
@@ -135,7 +115,7 @@ bool verify_signature(string signed_hash, string hash, string public_key_string)
 */
 	bool result = false;
 	Verifier verifier(public_key);
-	CryptoPP::StringSource ss2(signed_hash + hash, true,
+	CryptoPP::StringSource ss2(signature + hash, true,
 		new CryptoPP::SignatureVerificationFilter(verifier,
 			new CryptoPP::ArraySink((CryptoPP::byte *)&result, sizeof(result))));
 
@@ -151,32 +131,32 @@ void hash_transaction(string data, string &digest)
 	CryptoPP::SHA256 hash;
 	CryptoPP::StringSource ss(data, true, 
 		new CryptoPP::HashFilter(hash, 
-			new CryptoPP::HexEncoder(
-				new CryptoPP::StringSink(digest))));
+			new CryptoPP::StringSink(digest)));
 }
 
 
 /*
  * Creates a keypair based on the defined KEY_SIZE
  */
-void generate_key_pair(string &private_key_string, string &public_key_string){
-	CryptoPP::RSA::PrivateKey private_key;
+void generate_key_pair(string &pv_key_string, string &pb_key_string){
+	CryptoPP::RSA::PrivateKey pv_key;
 	CryptoPP::AutoSeededRandomPool rng;
 
-	private_key.GenerateRandomWithKeySize(rng, KEY_SIZE);
+	pv_key.GenerateRandomWithKeySize(rng, KEY_SIZE);
 
-	CryptoPP::RSA::PublicKey public_key(private_key);
+	CryptoPP::RSA::PublicKey public_key(pv_key);
 
-	write_key_to_string(private_key, private_key_string);
-	write_key_to_string(public_key, public_key_string);
+	write_key_to_string(pv_key, pv_key_string);
+	write_key_to_string(public_key, pb_key_string);
 }
 }
 
 /*
  * Loads a keypair from the file into the supplied strings.
  * If the file only contains a public key then only the public key is loaded. 
+ * TODO change asserts to a real checking system. Just return a boolean if the load fails.
  */
-void load_key_pair(string &pv_key_string, string &pb_key_string, const string file){
+void load_key_pair(string &pv_key_str, string &pb_key_string, const string file){
 	ifstream fs(file);
 	string input;
 	fs >> input;
@@ -188,40 +168,62 @@ void load_key_pair(string &pv_key_string, string &pb_key_string, const string fi
 	}
 	input = "";
 	while (input.compare(PRIVATE_BLOCK_END) != 0){
-		pv_key_string += input;
+		pv_key_str += input;
 		fs >> input;
 	}
 	assert(input.compare(PRIVATE_BLOCK_END) == 0);
 	
 }
 
-void save_key_pair(const string pv_key_string, const string pb_key_string, string file){
+
+
+void save_key_pair(const string pv_key_str, const string pb_key_string, string file){
 	ofstream fs(file);
 	fs << KEY_BLOCK_START << endl;
 	fs << pb_key_string << endl << PUBLIC_BLOCK_END << endl;
-	fs << pv_key_string << endl << PRIVATE_BLOCK_END << endl;
+	fs << pv_key_str << endl << PRIVATE_BLOCK_END << endl;
 }
 
 /*
- * Returns true if the hash matches the signed hash
+ * Get a base32 encoded string from a binary string
  */
+string enc_from_bin(string binary){
+	string encoded;
+	CryptoPP::StringSource ss(binary, true,
+		new CryptoPP::Base32Encoder(
+			new CryptoPP::StringSink(encoded)));
+	return encoded;
+}
+/*
+ * Get a binary string from a base32 encoded string
+ */
+string bin_from_enc(string encoded){
+	string binary;
+	CryptoPP::StringSource ss(binary, true,
+		new CryptoPP::Base32Decoder(
+			new CryptoPP::StringSink(binary)));
+	return binary;
+}
+
 
 int main(){
 
 	string stuff;
-	stuff = "this is a asdfasdfasdf    to hash";
+	stuff = "this is a message to hash";
 	string hash;
 	crypto::hash_transaction(stuff, hash);
-	cout << stuff.c_str() << endl;
-	cout << "This is the hash: " << hash << endl;
+	cout << stuff << endl;
+
+	cout << "This is the hash: " << enc_from_bin(hash) << endl;
+	cout << "hash length: " << hash.length() << endl;
 
 	string public_key, private_key;
 	crypto::generate_key_pair(private_key, public_key);
 
 	//load_key_pair(private_key, public_key, "test_key_pair.txt");
 
-	cout << "private key: " << private_key << endl;
-	cout << "public key: " << public_key << endl;
+	cout << "private key: " << enc_from_bin(private_key) << endl;
+	cout << "public key: " << enc_from_bin(public_key) << endl;
 	string signed_hash;
 	CryptoPP::RSA::PrivateKey pv_key;
 	CryptoPP::RSA::PublicKey pb_key;
@@ -230,7 +232,7 @@ int main(){
 
 	//cout << "Reads pub successfully\n";
 	crypto::read_key_from_string(pv_key, private_key);
-	cout << "reads priv successfully\n";
+
 	signed_hash = crypto::sign_hash(hash, private_key);
 	string message;
 	ifstream example("example.txt");
