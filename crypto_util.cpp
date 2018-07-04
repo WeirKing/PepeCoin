@@ -10,14 +10,14 @@
 #include		<iostream>
 #include 		<assert.h>
 
-
 using namespace std;
+
+string enc_from_bin(string binary);
+string bin_from_enc(string encoded);
+
 namespace crypto{
 
 #define KEY_SIZE 				2048
-#define KEY_BLOCK_START 		"==KEY_BLOCK_START=="
-#define PUBLIC_BLOCK_END 		"==PUBLIC_BLOCK_END=="
-#define PRIVATE_BLOCK_END 		"==PRIVATE_BLOCK_END=="
 
 using Signer 	= CryptoPP::RSASS<CryptoPP::PSSR, CryptoPP::Whirlpool>::Signer;
 using Verifier 	= CryptoPP::RSASS<CryptoPP::PSSR, CryptoPP::Whirlpool>::Verifier;
@@ -151,19 +151,38 @@ void generate_key_pair(string &pv_key_string, string &pb_key_string){
 }
 }
 
+
+#define ENC_KEY_BLOCK_START 	"==ENCODED_KEY_BLOCK_START=="
+#define KEY_BLOCK_START 		"==KEY_BLOCK_START=="
+#define PUBLIC_BLOCK_END 		"==PUBLIC_BLOCK_END=="
+#define PRIVATE_BLOCK_END 		"==PRIVATE_BLOCK_END=="
 /*
  * Loads a keypair from the file into the supplied strings.
  * If the file only contains a public key then only the public key is loaded. 
- * TODO change asserts to a real checking system. Just return a boolean if the load fails.
+ * 
+ * TODO return boolean if load fails. 
+ *		change the system to allow binary loading and sotrage and not just encoded loading and storage.
  */
-void load_key_pair(string &pv_key_str, string &pb_key_string, const string file){
+void load_key_pair(string &pv_key_str, string &pb_key_str, const string file, char type='B'){
+	pv_key_str = "";
+	pb_key_str = "";
 	ifstream fs(file);
 	string input;
+	if (type == 'B'){
+		fs >> pb_key_str >> pv_key_str;
+		return;
+	}
 	fs >> input;
-	assert(input.compare(KEY_BLOCK_START) == 0);
+	bool encoded = false;
+	if(input.compare(ENC_KEY_BLOCK_START) == 0){
+		cout << "does this right\n";
+		encoded = true;
+	} else if (input.compare(KEY_BLOCK_START) == 0){
+		encoded = false;
+	}
 	input = "";
 	while (input.compare(PUBLIC_BLOCK_END) != 0){
-		pb_key_string += input;
+		pb_key_str += input;
 		fs >> input;
 	}
 	input = "";
@@ -172,16 +191,35 @@ void load_key_pair(string &pv_key_str, string &pb_key_string, const string file)
 		fs >> input;
 	}
 	assert(input.compare(PRIVATE_BLOCK_END) == 0);
-	
+	if (encoded){
+		pv_key_str = bin_from_enc(pv_key_str);
+		pb_key_str = bin_from_enc(pb_key_str);
+	}
 }
 
 
+/*
+ * Saves the key pair to the file
+ * 
+ * TODO currently only saves in an encoded format. Change to accept binary formatting.
+ */
 
-void save_key_pair(const string pv_key_str, const string pb_key_string, string file){
+void save_key_pair(const string pv_key_str, const string pb_key_str, string file, char type='B'){
 	ofstream fs(file);
-	fs << KEY_BLOCK_START << endl;
-	fs << pb_key_string << endl << PUBLIC_BLOCK_END << endl;
-	fs << pv_key_str << endl << PRIVATE_BLOCK_END << endl;
+	type = 'E';
+	if (type == 'B'){
+		fs << pb_key_str << pv_key_str;
+	}
+	else if (type == 'E'){
+		string pb_key_enc, pv_key_enc;
+		pb_key_enc = enc_from_bin(pb_key_str);
+		pv_key_enc = enc_from_bin(pv_key_str);
+		fs << ENC_KEY_BLOCK_START << endl;
+		fs << pb_key_enc << endl << PUBLIC_BLOCK_END << endl;
+		fs << pv_key_enc << endl << PRIVATE_BLOCK_END << endl;
+	}
+	fs.close();
+
 }
 
 /*
@@ -220,10 +258,11 @@ int main(){
 	string public_key, private_key;
 	crypto::generate_key_pair(private_key, public_key);
 
-	//load_key_pair(private_key, public_key, "test_key_pair.txt");
+	load_key_pair(private_key, public_key, "test_key_pair.txt");
 
 	cout << "private key: " << enc_from_bin(private_key) << endl;
 	cout << "public key: " << enc_from_bin(public_key) << endl;
+	cout << "size of public key: " << public_key.length() << endl;
 	string signed_hash;
 	CryptoPP::RSA::PrivateKey pv_key;
 	CryptoPP::RSA::PublicKey pb_key;
@@ -238,7 +277,7 @@ int main(){
 	ifstream example("example.txt");
 	getline(example, message);
 	string test = crypto::sign_hash(message, private_key);
-	cout << "signed hash: " << signed_hash << endl;
+	cout << "signed hash: " << enc_from_bin(signed_hash) << endl;
 
 	cout << "size of signed: " << signed_hash.length() << endl;
 	cout << "size of hash: " << hash.length() << endl;
@@ -250,4 +289,4 @@ int main(){
 	}
 
 	return 0;
-}	
+}
