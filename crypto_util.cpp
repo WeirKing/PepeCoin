@@ -12,6 +12,10 @@
 
 
 using namespace std;
+
+string enc_from_bin(string binary);
+string bin_from_enc(string encoded);
+
 namespace crypto{
 
 #define KEY_SIZE 				2048
@@ -156,32 +160,45 @@ void generate_key_pair(string &pv_key_string, string &pb_key_string){
  * If the file only contains a public key then only the public key is loaded. 
  * TODO change asserts to a real checking system. Just return a boolean if the load fails.
  */
-void load_key_pair(string &pv_key_str, string &pb_key_string, const string file){
+void load_key_pair(string &pv_key_str, string &pb_key_str, const string file){
 	ifstream fs(file);
+	string pb_key_str_enc = "";
+	string pv_key_str_enc = "";;
+	pv_key_str = "";
+	pb_key_str = "";
+
 	string input;
 	fs >> input;
 	assert(input.compare(KEY_BLOCK_START) == 0);
-	input = "";
-	while (input.compare(PUBLIC_BLOCK_END) != 0){
-		pb_key_string += input;
-		fs >> input;
-	}
-	input = "";
-	while (input.compare(PRIVATE_BLOCK_END) != 0){
-		pv_key_str += input;
-		fs >> input;
-	}
+	fs >> input;
+	pb_key_str_enc += input;
+	fs >> input;
+	assert(input.compare(PUBLIC_BLOCK_END) == 0);
+
+	fs >> input;
+	pv_key_str_enc += input;
+	fs >> input;
 	assert(input.compare(PRIVATE_BLOCK_END) == 0);
-	
+
+
+	pv_key_str = bin_from_enc(pv_key_str_enc);
+	cout << pv_key_str << endl;
+	pb_key_str = bin_from_enc(pb_key_str_enc);
+
 }
 
 
 
-void save_key_pair(const string pv_key_str, const string pb_key_string, string file){
+void save_key_pair(const string pv_key_str, const string pb_key_str, string file){
 	ofstream fs(file);
+
 	fs << KEY_BLOCK_START << endl;
-	fs << pb_key_string << endl << PUBLIC_BLOCK_END << endl;
-	fs << pv_key_str << endl << PRIVATE_BLOCK_END << endl;
+
+	string pb_key_str_enc, pv_key_str_enc;
+	pv_key_str_enc = enc_from_bin(pv_key_str);
+	pb_key_str_enc = enc_from_bin(pb_key_str);
+	fs << pb_key_str_enc << endl << PUBLIC_BLOCK_END << endl;
+	fs << pv_key_str_enc << endl << PRIVATE_BLOCK_END << endl;
 }
 
 /*
@@ -220,7 +237,7 @@ int main(){
 	string public_key, private_key;
 	crypto::generate_key_pair(private_key, public_key);
 
-	//load_key_pair(private_key, public_key, "test_key_pair.txt");
+	load_key_pair(private_key, public_key, "test_key_pair.txt");
 
 	cout << "private key: " << enc_from_bin(private_key) << endl;
 	cout << "public key: " << enc_from_bin(public_key) << endl;
