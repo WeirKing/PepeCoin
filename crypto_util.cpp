@@ -45,10 +45,10 @@ void write_key_to_string(const CryptoPP::RSA::PrivateKey pv_key, string &pv_key_
 /*
  * Writes a public key to a string. 
  */
-void write_key_to_string(const CryptoPP::RSA::PublicKey pb_key, string &pb_key_string)
+void write_key_to_string(const CryptoPP::RSA::PublicKey pb_key, string &pb_key_str)
 {
-	pb_key_string = "";
-	CryptoPP::StringSink ss(pb_key_string);
+	pb_key_str = "";
+	CryptoPP::StringSink ss(pb_key_str);
 	pb_key.DEREncode(ss);
 	ss.MessageEnd();
 }
@@ -65,10 +65,10 @@ void read_key_from_string(CryptoPP::RSA::PrivateKey &pv_key, const string pv_key
 /*
  * Reads a public key from string.
  */
-void read_key_from_string(CryptoPP::RSA::PublicKey &pb_key, const string pb_key_string)
+void read_key_from_string(CryptoPP::RSA::PublicKey &pb_key, const string pb_key_str)
 {
-	//CryptoPP::StringSource ss(pb_key_string, true);
-	CryptoPP::StringSource ss(pb_key_string, true);
+	//CryptoPP::StringSource ss(pb_key_str, true);
+	CryptoPP::StringSource ss(pb_key_str, true);
 	pb_key.BERDecode(ss);
 }
 
