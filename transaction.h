@@ -26,7 +26,6 @@ public:
     string signed_hash;
     string public_key;
     string prev_hash;
-    Transaction *previous_transaction;
     Transaction();
     Transaction(string new_owner, Transaction *prev_t, string private_key);//Creates a new transaction in full
     Transaction(string new_owner, Transaction *prev_t);
@@ -75,12 +74,11 @@ void Transaction::set_hash(Transaction *prev)
  */
 void Transaction::sign_hash(string private_key)
 {
-    crypto::sign_hash(prev_hash, private_key, signed_hash);
+    signed_hash = crypto::sign_hash(prev_hash + public_key, private_key);
 }
 
 /*
- * Verifies that the transaction is valid based on the set previous transaction. Previous transaction is 100% trusted.
- * Previous transaction must be set first before calling this function
+ * Verifies that the transaction is valid based on the supplied previous transaction. Previous transaction is 100% trusted.
  */
 bool Transaction::verify_transaction(Transaction *prev){
     string prev_pub_key = prev->public_key;
@@ -91,14 +89,22 @@ bool Transaction::verify_transaction(Transaction *prev){
         return false;
     }
     
-    crypto::verify_signature(signed_hash, real_prev_hash, public_key);
-    return true;
+    if (crypto::verify_signature(signed_hash, real_prev_hash, public_key)){
+        return true;
+    } else {
+        return false;
+    }
 }
 
 Transaction::Transaction(string new_owner, Transaction *prev_t){
-    previous_transaction = prev_t;
     public_key = new_owner;
     set_hash(prev_t);
+}
+
+Transaction::Transaction(string new_owner, Transaction *prev_t, string private_key){
+    public_key = new_owner;
+    set_hash(prev_t);
+    sign_hash(private_key);
 }
 
 #endif

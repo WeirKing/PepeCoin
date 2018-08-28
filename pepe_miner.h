@@ -27,7 +27,7 @@ int welcome_socket;
 
 /*
  * A generic message that performs the communication between miners
- * When differently formatted info needs to be transmitted the generic array is converted into the correct info
+ * When differently formatted info needs to be transmitted the  genericarray is converted into the correct info
  * The message type is defined by a constant header character.
 
  * TODO: none

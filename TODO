@@ -8,8 +8,6 @@ Create a framework for mining a new pepecoin
 
 Separate the console interface and the backend network handling into separate threads.
 
-TODO Decide whether transactions should have a linked list or not. I really don't know if transactions should have a reference to their previous transaction or not. Definitely not next transaction but maybe previous transaction ://///
-
 
 Gotta get the crypto working so the signature doesn't incresae the size of the hash. 
 Get the basic console working
