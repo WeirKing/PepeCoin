@@ -12,6 +12,7 @@
 #include        <sys/types.h>
 #include        <iostream>
 #include        <vector>
+#include		"crypto.util"
 #include        "unistd.h"              /* for read(fd, buffer, size) */
 
 #ifndef __pepe_miner__

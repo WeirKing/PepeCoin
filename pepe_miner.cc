@@ -78,7 +78,7 @@ void handle_transaction_message(MESSAGE *m){
 /*
  * First thing run when starting the function. Should implement the main_operation_loop to perform its stuff.
  */
-int main() {
+int test_main_2() {
 	//initialize_connection();
 	int new_client_socket;
 	new_client_socket = connect_to_client((char *)"127.0.0.1", 60000);

@@ -7,7 +7,7 @@
 #include        <arpa/inet.h>           /* for sockaddr_in and inet_ntoa() */
 #include        <sys/types.h>
 #include        <unistd.h>
-#include        "crypto_util.cpp"
+#include        "crypto.util"
 
 /*
  * A transaction in theory is the public key of the current owner, a hash of the pub key of current owner 
@@ -74,7 +74,7 @@ void Transaction::set_hash(Transaction *prev)
  */
 void Transaction::sign_hash(string private_key)
 {
-    signed_hash = crypto::sign_hash(prev_hash + public_key, private_key);
+    signed_hash = crypto::sign_data(prev_hash + public_key, private_key);
 }
 
 /*
