@@ -9,8 +9,6 @@ Create a framework for mining a new pepecoin
 Separate the console interface and the backend network handling into separate threads.
 
 
-Gotta get the crypto working so the signature doesn't incresae the size of the hash. 
 Get the basic console working
-	load a key from supplied file (also load default key from file on startup)
 	Store and load the available transactions to a private key.
 	Generate a transaction.

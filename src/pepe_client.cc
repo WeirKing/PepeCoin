@@ -1,4 +1,6 @@
 #include		"pepe_miner.h"
+#include		"transaction.h"
+#include 		"transaction_database.h"
 
 using namespace std;
 
@@ -28,10 +30,14 @@ typedef struct {
 	string pb_key;
 } key_pair;
 
+
+TransactionDB db;
 key_pair *current = new key_pair;
 
 void handle_generate(string input);
 bool handle_load(string input);
+void handle_current();
+bool handle_send();
 
 void console(){
 
@@ -53,6 +59,10 @@ void console(){
 			case 'L': {
 				cin >> input;
 				handle_load(input);
+				break;
+			}
+			case 'C': {
+				handle_current();
 				break;
 			}
 		}
@@ -82,7 +92,7 @@ string lower_string(string &input){
 void handle_generate(string input){
 	cout << "username: " << input << endl;
 	string pv_key, pb_key, file_name;
-	file_name = lower_string(input) + ".key";
+	file_name = "keys/" + lower_string(input) + ".key";
 	crypto::generate_key_pair(pv_key, pb_key);
 	crypto::save_key_pair(pv_key, pb_key, file_name);
 }
@@ -96,7 +106,7 @@ void handle_generate(string input){
  */ 
 bool handle_load(string input){
 
-	string file_name = lower_string(input) + ".key";
+	string file_name = "keys/" + lower_string(input) + ".key";
 	ifstream load(file_name);
 	if (!load.good()){
 		cout << "There is no file " << file_name << " in the current key directory." << endl;
@@ -105,6 +115,7 @@ bool handle_load(string input){
 	string pv_key, pb_key;
 	if (!crypto::load_key_pair(pv_key, pb_key, file_name)){
 		cout << file_name << " is not a valid key file" << endl;
+		return false;
 	}
 	if (pv_key.compare("") == 0){
 		cout << "Loaded public-only key" << endl;
@@ -115,6 +126,61 @@ bool handle_load(string input){
 	current->username = lower_string(input);
 	current->pv_key = pv_key;
 	current->pb_key = pb_key;
+	return true;
+}
+
+bool handle_load_suppressed(string username, string &pb_key){
+
+	string file_name = "keys/" + lower_string(username) + ".key";
+	ifstream load(file_name);
+	if (!load.good()){
+		return false;
+	}
+	string pv_key;
+	if (!crypto::load_key_pair(pv_key, pb_key, file_name)){
+		return false;
+	}
+	return true;
+}
+
+/*
+ * Invoked with: C, Current
+ * Outputs the information regarding the currently loaded keypair to the screen
+ */
+void handle_current(){
+	if (current->username.empty()){
+		cout << "No user is currently loaded\n";
+		return;
+	}
+	cout << "Username: " << current->username << endl;
+	if (current->pv_key.empty()){
+		cout << "Public key only\n";
+	}
+}
+
+
+/*
+ * Invoked with: S, Send
+ * Finds an unspent transaction for the currently loaded user. Makes a new transaction based off of that 
+ 	transaction and the to pub_key.
+ * Communicates with the network controls to send the trnasaction to the network. 
+
+ * TODO
+ 	Figure out how you're going to implement the transaction db.
+ 	Maybe make another high-level utility file so the client handle_ functions can be simplified.
+ */
+bool handle_send(){
+	string to, to_pb = "";
+	int amount;
+	cin >> to;
+	cin >> amount;
+	handle_load_suppressed(to, to_pb);
+	Transaction *new_t = new Transaction;
+	new_t->public_key = to_pb;
+	db.get()
+
+
+
 	return true;
 }
 
