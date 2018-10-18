@@ -1,5 +1,8 @@
-#include		"../src/pepe_miner.h"
+//#include	"../src/temple_miner.h"
+#include	<string>
 #include	<fstream>
+#include	<iostream>
+#include	"nArray.h"
 
 
 enum Suit {club=0, diamond=1, heart=2, spade=3};
@@ -9,10 +12,10 @@ public:
 	Suit suit;
 	Card(int rank_, Suit suit_);
 	Card();
-	string ascii();
+	std::string ascii();
 	int compare(Card other);
 private:
-	string rank_str();
+	std::string rank_str();
 };
 Card::Card(int rank_, Suit suit_){
 	suit = suit_;
@@ -23,10 +26,10 @@ Card::Card(){
 	rank = -1;
 }
 
-string Card::rank_str(){
-	string temp;
+std::string Card::rank_str(){
+	std::string temp;
 	if (rank > 1 and rank < 10){
-		temp = to_string(rank) + " ";
+		temp = std::to_string(rank) + " ";
 	} else {
 		switch(rank){
 			case 10:
@@ -65,9 +68,9 @@ int Card::compare(Card other){
 /*
  * returns ascii representation of card
  */
-string Card::ascii(){
-	string rep = "", temp = "", check;
-	ifstream card("cards.txt");
+std::string Card::ascii(){
+	std::string rep = "", temp = "", check;
+	std::ifstream card("cards.txt");
 
 	switch(suit){
 		case spade:
@@ -140,7 +143,7 @@ int poker_value(Card hand[], int size){
 				count = 1;
 			}
 			if (count >= 5){
-				value = max(value, hand[i+1].rank + straight_flush);
+				value = std::max(value, hand[i+1].rank + straight_flush);
 			}
 		}
 	}
@@ -156,7 +159,7 @@ int poker_value(Card hand[], int size){
 			count = 1;
 		}
 		if (count >= 5){
-			value = max(value, hand[i+1].rank + straight);
+			value = std::max(value, hand[i+1].rank + straight);
 		}
 	}
 
@@ -172,32 +175,63 @@ int poker_value(Card hand[], int size){
 		}
 		if (count == 2){
 			if (full_3 > 0 and full_3 != hand[i+1].rank){
-				value = max(value, full_3 + full_house);
+				value = std::max(value, full_3 + full_house);
 			}
-			value = max(value, hand[i+1].rank + kind_2);
+			value = std::max(value, hand[i+1].rank + kind_2);
 		}
 		if (count == 3){
 			full_3 = hand[i+1].rank;
-			value = max(value, hand[i+1].rank + kind_3);
+			value = std::max(value, hand[i+1].rank + kind_3);
 		}
 		if (count >= 4){
-			value = max(value, hand[i+1].rank + kind_4);
+			value = std::max(value, hand[i+1].rank + kind_4);
 		}
 	}
 
 //High card
-	value = max(value, hand[size - 1].rank);
+	value = std::max(value, hand[size - 1].rank);
 
 
 	return value;
 }
 
+/*
+ * Returns -1 if h1 is a better hand than h2, 0 if equal, 1 otherwise 
+
+ * Implementation: check for the standard hand types in order of best to worst for each hand.
+ 	if on beats hte other based on hand type alone (i.e. best hand type of both is flush and only one has it)
+ 	then obviously that hand wins.
+ 	If both hands have the same type then compare the rank of the hands.
+ */
+int compare_hand(Card h1[], int h1_size, Card h2[], int h2_size){
+	//straight flush
+	int i, j, k, value = 0, hand, sizes[2];
+	sizes[0] = h1_size; sizes[1] = h2_size;
+	Card temp;
+	Card *hands[2];
+	hands[0] = h1;
+	hands[1] = h2;
+//Sort hand
+	for (hand = 0; hand < 2; hand++){
+		for (i = 0; i < sizes[hand]; i++){
+			for (j = i+1; j < sizes[hand]; j++){
+				if (hands[hand][i].compare(hands[hand][j]) < 0){
+					temp = hands[hand][i];
+					hands[hand][i] = hands[hand][j];
+					hands[hand][j] = temp;
+				}
+			}
+		}
+	}
+//
+}
+
 Card cin_card(Card &new_c){
 	int rank;
 	Suit suit;
-	string input;
-	cin >> rank;
-	cin >> input;
+	std::string input;
+	std::cin >> rank;
+	std::cin >> input;
 	if (input.compare("heart") == 0){
 		suit = heart;
 	} else if (input.compare("diamond") == 0){
@@ -223,7 +257,7 @@ int main(int argc, char ** argv){
 		cin_card(temp_c);
 		hand[i] = temp_c;
 	}
-	cout << "Score: " << 
+	std::cout << "Score: " << std::endl;
 /*
 	Card new_c;
 	cin_card(new_c);

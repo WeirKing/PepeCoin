@@ -1,7 +1,7 @@
 /**
- * Title: pepe_miner.cc
+ * Title: temple_miner.cc
  * Author: Kixo
- * Purpose: miner for pepe coin
+ * Purpose: miner for temple coin
  * Date: 4/1/2018
  */
 
@@ -11,13 +11,13 @@
 #include        <stdlib.h>              /* for atoi() and exit() */
 #include        <arpa/inet.h>           /* for sockaddr_in and inet_ntoa() */
 #include        <sys/types.h>
-#include        "pepe_miner.util"       /* utility funcions for pepe miner */
+#include        "temple_miner.util"       /* utility funcions for temple miner */
 #include        <unistd.h>
 
 bool end_program = false;
 
 /*
- * Performs all the functions of the pepe coin including the console interface. Run in a continual loop
+ * Performs all the functions of the temple coin including the console interface. Run in a continual loop
 
  * TODO: Compartmentalize handling of different message types.
  */

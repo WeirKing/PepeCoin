@@ -3,7 +3,7 @@ Convert the miner to a class based system. This not really necessary but probabl
 Mining should be implemented parallel to handling client/miner communications
 
 Change the transaction framework to be entirely based on a hash table rather than a linked list. 
-Create a framework for mining a new pepecoin
+Create a framework for mining a new templecoin
 
 
 Separate the console interface and the backend network handling into separate threads.

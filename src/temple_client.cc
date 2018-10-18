@@ -1,4 +1,4 @@
-#include		"pepe_miner.h"
+#include		"temple_miner.h"
 #include		"transaction.h"
 #include 		"transaction_database.h"
 
@@ -12,7 +12,7 @@ using namespace std;
  (C)urrent
  	prints currently loaded user
  (A)mount
- 	prints the amount of PepeCoin available to currently loaded user
+ 	prints the amount of templeCoin available to currently loaded user
  (F)iles
  	prints the known accounts and whether they are pub only or full keys
  */

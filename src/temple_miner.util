@@ -1,11 +1,11 @@
 /**
- * Title: pepe_miner.util
+ * Title: temple_miner.util
  * Author: Kixo
- * Purpose: utility functions for the pepe miner
+ * Purpose: utility functions for the temple miner
  * Date: 4/1/2018
  */
 
-#include "pepe_miner.h"               /* Header information for pepe_miner */
+#include "temple_miner.h"               /* Header information for temple_miner */
 
 /*
  * Sends a message to the specified connected client known as a buddy, defined by the supplied socket connector

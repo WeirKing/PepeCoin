@@ -1,7 +1,7 @@
 /**
- * Title: pepe_miner.util
+ * Title: temple_miner.util
  * Author: Kixo
- * Purpose: header file for the pepe miner
+ * Purpose: header file for the temple miner
  * Date: 4/1/2018
  */
 
@@ -15,8 +15,8 @@
 #include		"crypto.util"
 #include        "unistd.h"              /* for read(fd, buffer, size) */
 
-#ifndef __pepe_miner__
-#define __pepe_miner__
+#ifndef __temple_miner__
+#define __temple_miner__
 using namespace std;
 
 #define MESSAGE_LENGTH 1024
