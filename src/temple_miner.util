@@ -23,7 +23,7 @@ int send_message(MESSAGE *message, int sockfd){
 
 /*
  * Broadcasts a message to all actively connected clients, known as buddies.
- * 
+ *
  * TODO: NONE
  */
 int broadcast_message(MESSAGE *message){
@@ -35,9 +35,9 @@ int broadcast_message(MESSAGE *message){
     return 0;
 }
 /*
- * Handle a message from a client 
+ * Handle a message from a client
  * Current functionality is merely echoing the message to the standard output
- * 
+ *
  * TODO: Change the handling of received messages to the correct functionality
  * Message handling can be treated as different 1023 byte data based on the header
  */
@@ -57,7 +57,7 @@ int handle_incoming_message(int client_index){
 /*
  * Initializes listening connection so other buddies may connect
  * Also attempts to create a connection with the currently known active buddies.
- * 
+ *
    RETURN: integer identifier reporting success
  * TODO: create connection with currently known buddies
  */

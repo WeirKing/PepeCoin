@@ -50,7 +50,7 @@ void write_key_to_string(const CryptoPP::RSA::PrivateKey pv_key, string &pv_key_
 	ss.MessageEnd();
 }
 /*
- * Writes a public key to a string. 
+ * Writes a public key to a string.
  * Key string unencoded
  */
 void write_key_to_string(const CryptoPP::RSA::PublicKey pb_key, string &pb_key_str)
@@ -97,7 +97,7 @@ string sign_data(string data, string priv_key){
 	size_t req = c.MinEncodedSize();
 	signature.resize(req);
 	c.Encode((CryptoPP::byte *) &signature[0], signature.size());
-	
+
 	return signature;
 }
 
@@ -130,8 +130,8 @@ void hash_transaction(string data, string &digest)
 {
 	digest = "";
 	CryptoPP::SHA256 hash;
-	CryptoPP::StringSource ss(data, true, 
-		new CryptoPP::HashFilter(hash, 
+	CryptoPP::StringSource ss(data, true,
+		new CryptoPP::HashFilter(hash,
 			new CryptoPP::StringSink(digest)));
 }
 
@@ -154,7 +154,7 @@ void generate_key_pair(string &pv_key_string, string &pb_key_string){
 
 /*
  * Loads a keypair from the file into the supplied strings.
- * If the file only contains a public key then only the public key is loaded. 
+ * If the file only contains a public key then only the public key is loaded.
  * TODO Allow just public keys to be loaded.
  */
 bool load_key_pair(string &pv_key_str, string &pb_key_str, const string file){
@@ -170,7 +170,7 @@ bool load_key_pair(string &pv_key_str, string &pb_key_str, const string file){
 	if (!(input.compare(KEY_BLOCK_START) == 0)){
 		return false;
 	}
-	
+
 	fs >> input;
 	pb_key_str_enc = input;
 

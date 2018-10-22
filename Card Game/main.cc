@@ -196,7 +196,7 @@ int poker_value(Card hand[], int size){
 }
 
 /*
- * Returns -1 if h1 is a better hand than h2, 0 if equal, 1 otherwise 
+ * Returns -1 if h1 is a better hand than h2, 0 if equal, 1 otherwise
 
  * Implementation: check for the standard hand types in order of best to worst for each hand.
  	if on beats hte other based on hand type alone (i.e. best hand type of both is flush and only one has it)
@@ -206,6 +206,7 @@ int poker_value(Card hand[], int size){
 int compare_hand(Card h1[], int h1_size, Card h2[], int h2_size){
 	//straight flush
 	int i, j, k, value = 0, hand, sizes[2];
+	bool is_section[2];
 	sizes[0] = h1_size; sizes[1] = h2_size;
 	Card temp;
 	Card *hands[2];
@@ -223,7 +224,11 @@ int compare_hand(Card h1[], int h1_size, Card h2[], int h2_size){
 			}
 		}
 	}
-//
+//four of a kind
+	for (hand = 0; hand < 2; hand++){
+		int count = 0;
+		for (i = 0; i < )
+	}
 }
 
 Card cin_card(Card &new_c){
